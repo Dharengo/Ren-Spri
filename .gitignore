@@ -1,7 +1,6 @@
 log.txt
 traceback.txt
 game/gui
-stick.png
 game/saves
 game/tl
 *.rpyc
@@ -9,3 +8,6 @@ gui.rpy
 options.rpy
 screens.rpy
 script.rpy
+game/images
+*.autosave.scml
+errors.txt
