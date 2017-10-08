@@ -1,7 +1,6 @@
 log.txt
 traceback.txt
 game/gui
-stick.png
 game/saves
 game/tl
 *.rpyc
