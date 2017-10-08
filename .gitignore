@@ -9,3 +9,6 @@ gui.rpy
 options.rpy
 screens.rpy
 script.rpy
+game/images
+*.autosave.scml
+errors.txt
