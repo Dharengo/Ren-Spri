@@ -45,8 +45,6 @@ init python:
                 objs = tree.findall("./mainline/key/object_ref")
                 parents = [None] * (max(_all_ids(bones)) + 1)
                 ims = [None] * (max(_all_ids(objs)) + 1)
-                global output
-                output = parents
                 for ref in bones:
                     id = _id(ref)
                     if not parents[id]:
@@ -55,17 +53,33 @@ init python:
                     id = _id(ref)
                     if not ims[id]:
                         ims[id] = self._Animator(self, tree, ref, parents, images)
-                ###TODO: INCORPORATE A DICTIONARY FOR BONES###
   
         class _Animator():
             def __init__(self, root, tree, ref, parents, images, **kwargs):
                 super(type(self), self).__init__(**kwargs)
                 if isinstance(tree, ElementTree.Element) and tree.tag == "animation":
+                    self._root = root
                     p = ref.get("parent")
                     if p:
                         _append_child(parents[int(p)], self)
                     else:
                         _append_child(root, self)
+                    timeline = tree.find("./timeline[@id='{}']".format(ref.get("timeline")))
+                    self._name = timeline.get("name")
+                    if ref.tag == "bone_ref":
+                        self._obj = self._Bone(self)
+                    else:
+                        self._obj = None
+                    
+                    
+            class _Bone(renpy.Displayable):
+                def __init__(self, animator, **kwargs):
+                    super(type(self), self).__init__(**kwargs)
+                    self._animator = animator
+                        
+        def render(self, width, height, st, at):
+            if hasattr(self, "_children"):
+                pass
                         
     class SpriterObject(renpy.Displayable):
         """
@@ -138,6 +152,8 @@ init python:
                         trans.set_child(val)
                     else:
                         setattr(trans, name, val)
+                    global output
+                    output = trans.xpos
                 return 0
             return c
         
@@ -170,9 +186,10 @@ init python:
             
         def _render(self, width, height, st, at):
             """Renders child Bones or Parts"""
-            tr = renpy.render(self._timelines[0]._transform(), width, height, st, at)
+            transform = self._timelines[0]._transform()
+            tr = renpy.render(transform, width, height, st, at)
             r = renpy.Render(*tr.get_size())
-            r.blit(tr, (0, 0))
+            r.place(transform, render=tr)
             return r
             
     class Entity(SpriterObject):
